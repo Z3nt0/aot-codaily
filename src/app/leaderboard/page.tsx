@@ -1,54 +1,55 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { Navbar } from "@/components/layout/Navbar";
 
-const pageVariants = {
-  initial: { opacity: 0, y: 20 },
-  in: { opacity: 1, y: 0 },
-  out: { opacity: 0, y: -20 }
-};
 
-// Mock leaderboard data
-const leaderboardData = {
-  daily: [
-    { rank: 1, name: "Alex Chen", username: "alexchen", streak: 45, problems: 156, score: 2847, avatar: null },
-    { rank: 2, name: "Sarah Kim", username: "sarahkim", streak: 38, problems: 142, score: 2653, avatar: null },
-    { rank: 3, name: "Mike Johnson", username: "mikej", streak: 35, problems: 138, score: 2519, avatar: null },
-    { rank: 4, name: "Emma Wilson", username: "emmaw", streak: 32, problems: 125, score: 2384, avatar: null },
-    { rank: 5, name: "David Lee", username: "davidl", streak: 28, problems: 118, score: 2251, avatar: null },
-    { rank: 6, name: "Lisa Zhang", username: "lisaz", streak: 25, problems: 112, score: 2103, avatar: null },
-    { rank: 7, name: "Tom Brown", username: "tomb", streak: 22, problems: 98, score: 1956, avatar: null },
-    { rank: 8, name: "Anna Davis", username: "annad", streak: 20, problems: 87, score: 1823, avatar: null },
-    { rank: 9, name: "Chris Wilson", username: "chrisw", streak: 18, problems: 76, score: 1694, avatar: null },
-    { rank: 10, name: "Maria Garcia", username: "mariag", streak: 15, problems: 65, score: 1567, avatar: null }
-  ],
-  weekly: [
-    { rank: 1, name: "Sarah Kim", username: "sarahkim", streak: 38, problems: 142, score: 2653, avatar: null },
-    { rank: 2, name: "Alex Chen", username: "alexchen", streak: 45, problems: 156, score: 2847, avatar: null },
-    { rank: 3, name: "Emma Wilson", username: "emmaw", streak: 32, problems: 125, score: 2384, avatar: null },
-    { rank: 4, name: "Mike Johnson", username: "mikej", streak: 35, problems: 138, score: 2519, avatar: null },
-    { rank: 5, name: "David Lee", username: "davidl", streak: 28, problems: 118, score: 2251, avatar: null }
-  ],
-  allTime: [
-    { rank: 1, name: "Alex Chen", username: "alexchen", streak: 45, problems: 156, score: 2847, avatar: null },
-    { rank: 2, name: "Sarah Kim", username: "sarahkim", streak: 38, problems: 142, score: 2653, avatar: null },
-    { rank: 3, name: "Mike Johnson", username: "mikej", streak: 35, problems: 138, score: 2519, avatar: null },
-    { rank: 4, name: "Emma Wilson", username: "emmaw", streak: 32, problems: 125, score: 2384, avatar: null },
-    { rank: 5, name: "David Lee", username: "davidl", streak: 28, problems: 118, score: 2251, avatar: null },
-    { rank: 6, name: "Lisa Zhang", username: "lisaz", streak: 25, problems: 112, score: 2103, avatar: null },
-    { rank: 7, name: "Tom Brown", username: "tomb", streak: 22, problems: 98, score: 1956, avatar: null },
-    { rank: 8, name: "Anna Davis", username: "annad", streak: 20, problems: 87, score: 1823, avatar: null },
-    { rank: 9, name: "Chris Wilson", username: "chrisw", streak: 18, problems: 76, score: 1694, avatar: null },
-    { rank: 10, name: "Maria Garcia", username: "mariag", streak: 15, problems: 65, score: 1567, avatar: null }
-  ]
-};
+// Leaderboard data interface
+interface LeaderboardEntry {
+  rank: number;
+  id: string;
+  discordId: string;
+  username: string;
+  discriminator: string | null;
+  avatar: string | null;
+  currentStreak: number;
+  longestStreak: number;
+  totalProblems: number;
+  totalScore: number;
+  joinedAt: string;
+}
 
 export default function LeaderboardPage() {
   const { data: session, status } = useSession();
   const [activePeriod, setActivePeriod] = useState("daily");
+  const [leaderboardData, setLeaderboardData] = useState<LeaderboardEntry[]>([]);
+  const [userRank, setUserRank] = useState<LeaderboardEntry | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch leaderboard data
+  useEffect(() => {
+    const fetchLeaderboard = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`/api/leaderboard?period=${activePeriod}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch leaderboard');
+        }
+        const data = await response.json();
+        setLeaderboardData(data.leaderboard);
+        setUserRank(data.userRank);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to fetch leaderboard');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchLeaderboard();
+  }, [activePeriod]);
 
   if (status === "loading") {
     return (
@@ -89,17 +90,10 @@ export default function LeaderboardPage() {
     );
   }
 
-  const currentLeaderboard = leaderboardData[activePeriod as keyof typeof leaderboardData];
+  const currentLeaderboard = leaderboardData;
 
   return (
-    <motion.div
-      className="min-h-screen bg-background text-foreground"
-      initial="initial"
-      animate="in"
-      exit="out"
-      variants={pageVariants}
-      transition={{ duration: 0.3 }}
-    >
+    <div className="min-h-screen bg-background text-foreground">
       {/* Navigation */}
       <Navbar />
 
@@ -186,37 +180,41 @@ export default function LeaderboardPage() {
                     {user.rank}
                   </div>
                   <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center overflow-hidden">
                       {user.avatar ? (
                         <img 
-                          src={user.avatar}
-                          alt={user.name}
-                          className="w-10 h-10 rounded-full"
+                          src={`https://cdn.discordapp.com/avatars/${user.discordId}/${user.avatar}.png`}
+                          alt={user.username}
+                          className="w-10 h-10 rounded-full object-cover"
+                          onError={(e) => {
+                            // Hide the image and show fallback if it fails to load
+                            e.currentTarget.style.display = 'none';
+                            e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                          }}
                         />
-                      ) : (
-                        <span className="text-sm font-medium">
-                          {user.name.charAt(0).toUpperCase()}
-                        </span>
-                      )}
+                      ) : null}
+                      <span className={`text-sm font-medium ${user.avatar ? 'hidden' : ''}`}>
+                        {user.username.charAt(0).toUpperCase()}
+                      </span>
                     </div>
                     <div>
-                      <div className="font-semibold text-card-foreground">{user.name}</div>
-                      <div className="text-sm text-muted-foreground">@{user.username}</div>
+                      <div className="font-semibold text-card-foreground">{user.username}</div>
+                      <div className="text-sm text-muted-foreground">#{user.discriminator || '0000'}</div>
                     </div>
                   </div>
                 </div>
                 <div className="flex items-center space-x-6">
                   <div className="text-center">
                     <div className="text-sm text-muted-foreground">Streak</div>
-                    <div className="font-bold text-primary">{user.streak} days</div>
+                    <div className="font-bold text-primary">{user.currentStreak} days</div>
                   </div>
                   <div className="text-center">
                     <div className="text-sm text-muted-foreground">Problems</div>
-                    <div className="font-bold text-foreground">{user.problems}</div>
+                    <div className="font-bold text-foreground">{user.totalProblems}</div>
                   </div>
                   <div className="text-center">
                     <div className="text-sm text-muted-foreground">Score</div>
-                    <div className="font-bold text-primary">{user.score}</div>
+                    <div className="font-bold text-primary">{user.totalScore}</div>
                   </div>
                 </div>
               </motion.div>
@@ -225,7 +223,7 @@ export default function LeaderboardPage() {
         </motion.div>
 
         {/* Your Rank (if user is in leaderboard) */}
-        {session?.user && (
+        {session?.user && userRank && (
           <motion.div
             className="mt-8 bg-primary/10 backdrop-blur-sm rounded-xl border border-primary/20 p-6"
             initial={{ opacity: 0, y: 20 }}
@@ -235,25 +233,26 @@ export default function LeaderboardPage() {
             <h3 className="text-lg font-semibold text-primary mb-4">Your Performance</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="text-center">
-                <div className="text-2xl font-bold text-primary">#156</div>
+                <div className="text-2xl font-bold text-primary">#{userRank.rank}</div>
                 <div className="text-sm text-muted-foreground">AOT Academy Rank</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-primary">7</div>
+                <div className="text-2xl font-bold text-primary">{userRank.currentStreak}</div>
                 <div className="text-sm text-muted-foreground">Current Streak</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-primary">42</div>
+                <div className="text-2xl font-bold text-primary">{userRank.totalProblems}</div>
                 <div className="text-sm text-muted-foreground">Problems Solved</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-primary">1,250</div>
+                <div className="text-2xl font-bold text-primary">{userRank.totalScore.toLocaleString()}</div>
                 <div className="text-sm text-muted-foreground">Total Score</div>
               </div>
             </div>
           </motion.div>
         )}
       </main>
-    </motion.div>
+    </div>
   );
 }
+

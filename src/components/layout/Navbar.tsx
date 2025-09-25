@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
@@ -9,31 +8,30 @@ export function Navbar() {
   const { data: session } = useSession();
 
   return (
-    <motion.nav
-      className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border"
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-    >
+    <nav className="sticky top-0 z-50 bg-background border-b border-border" style={{ transform: 'translateZ(0)' }}>
       <div className="container mx-auto px-6 py-4">
         <div className="flex justify-between items-center">
-          {/* Left side: Logo and Leaderboard */}
+          {/* Left side: Logo and Navigation Links */}
           <div className="flex items-center space-x-8">
-            <motion.div
-              className="text-2xl font-bold text-foreground"
-              whileHover={{ scale: 1.05 }}
-              transition={{ duration: 0.2 }}
-            >
+            <div className="text-2xl font-bold text-foreground">
               <Link href="/">
                 <span className="text-primary">AOT</span> CoDaily
               </Link>
-            </motion.div>
-            <Link 
-              href="/leaderboard" 
-              className="text-muted-foreground hover:text-foreground transition-colors font-medium"
-            >
-              Leaderboard
-            </Link>
+            </div>
+            <div className="flex items-center space-x-6">
+              <Link 
+                href="/dashboard" 
+                className="text-muted-foreground hover:text-foreground transition-colors font-medium"
+              >
+                Home
+              </Link>
+              <Link 
+                href="/leaderboard" 
+                className="text-muted-foreground hover:text-foreground transition-colors font-medium"
+              >
+                Leaderboard
+              </Link>
+            </div>
           </div>
 
           {/* Right side: Theme toggle and Profile dropdown */}
@@ -42,11 +40,7 @@ export function Navbar() {
             
             {/* Profile Dropdown */}
             <div className="relative group">
-              <motion.button
-                className="flex items-center space-x-2 text-muted-foreground hover:text-foreground transition-colors"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
+              <button className="flex items-center space-x-2 text-muted-foreground hover:text-foreground transition-colors">
                 <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
                   {session?.user?.avatar ? (
                     <img 
@@ -66,7 +60,7 @@ export function Navbar() {
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
-              </motion.button>
+              </button>
 
               {/* Dropdown Menu */}
               <div className="absolute right-0 mt-2 w-48 bg-background border border-border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
@@ -95,6 +89,7 @@ export function Navbar() {
           </div>
         </div>
       </div>
-    </motion.nav>
+    </nav>
   );
 }
+

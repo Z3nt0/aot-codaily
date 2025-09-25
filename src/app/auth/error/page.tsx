@@ -5,11 +5,6 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
-const pageVariants = {
-  initial: { opacity: 0, y: 20 },
-  in: { opacity: 1, y: 0 },
-  out: { opacity: 0, y: -20 }
-};
 
 const errorMessages = {
   Configuration: "There is a problem with the server configuration.",
@@ -23,14 +18,7 @@ export default function AuthErrorPage() {
   const error = searchParams.get("error") as keyof typeof errorMessages;
 
   return (
-    <motion.div
-      className="min-h-screen flex items-center justify-center bg-background text-foreground"
-      initial="initial"
-      animate="in"
-      exit="out"
-      variants={pageVariants}
-      transition={{ duration: 0.3 }}
-    >
+    <div className="min-h-screen flex items-center justify-center bg-background text-foreground">
       <div className="max-w-md w-full space-y-8 p-8">
         <div className="absolute top-4 right-4">
           <ThemeToggle />
@@ -107,7 +95,7 @@ export default function AuthErrorPage() {
           <ul className="space-y-2 text-sm text-primary/80">
             <li className="flex items-start">
               <span className="w-2 h-2 bg-primary rounded-full mr-3 mt-2 flex-shrink-0"></span>
-              Make sure you're signed in to Discord
+              Make sure you&apos;re signed in to Discord
             </li>
             <li className="flex items-start">
               <span className="w-2 h-2 bg-primary rounded-full mr-3 mt-2 flex-shrink-0"></span>
@@ -124,6 +112,6 @@ export default function AuthErrorPage() {
           </ul>
         </motion.div>
       </div>
-    </motion.div>
+    </div>
   );
 }

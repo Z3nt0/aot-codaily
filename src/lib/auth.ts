@@ -1,6 +1,5 @@
 import { NextAuthOptions } from "next-auth";
 import DiscordProvider from "next-auth/providers/discord";
-import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
 
 interface DiscordProfile {
@@ -130,6 +129,12 @@ export const authOptions: NextAuthOptions = {
     },
     async redirect({ url, baseUrl }) {
       console.log("🔄 Redirect callback called:", { url, baseUrl });
+      
+      // If user is already authenticated and trying to access root, redirect to dashboard
+      if (url === baseUrl || url === `${baseUrl}/`) {
+        console.log("✅ Redirecting authenticated user to dashboard");
+        return `${baseUrl}/dashboard`;
+      }
       
       // Allows relative callback URLs
       if (url.startsWith("/")) {

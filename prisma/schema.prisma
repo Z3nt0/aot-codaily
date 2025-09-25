@@ -86,10 +86,14 @@ model User {
 model Problem {
   id                String   @id @default(cuid())
   title             String
-  descriptionMd     String
+  description       String   @db.Text
   difficulty        Difficulty
   topic             String?
-  publishedAt       DateTime @default(now())
+  inputFormat       String?  @db.Text
+  outputFormat      String?  @db.Text
+  constraints       String?  @db.Text
+  scheduledDate     DateTime? // Date when problem should be published
+  publishedAt       DateTime?
   createdBy         String?
   openaiGenerated   Boolean  @default(false)
   metadata          Json     @default("{}")
@@ -99,8 +103,26 @@ model Problem {
   
   // Relations
   submissions       Submission[]
+  testCases         TestCase[]
   
   @@map("problems")
+}
+
+// Test cases for problems
+model TestCase {
+  id          String     @id @default(cuid())
+  problemId   String
+  type        TestType
+  input       String     @db.Text
+  output      String     @db.Text
+  isHidden    Boolean    @default(false)
+  order       Int        @default(0)
+  createdAt   DateTime   @default(now())
+  
+  // Relations
+  problem     Problem    @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  
+  @@map("test_cases")
 }
 
 // User code submissions
@@ -179,4 +201,9 @@ enum LeaderboardType {
   WEEKLY
   MONTHLY
   ALL_TIME
+}
+
+enum TestType {
+  SAMPLE
+  HIDDEN
 }

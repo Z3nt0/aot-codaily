@@ -4,29 +4,13 @@
 import { motion } from "framer-motion";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
-const pageVariants = {
-  initial: { opacity: 0 },
-  in: { opacity: 1 },
-  out: { opacity: 0 }
-};
 
 export default function Home() {
   return (
-    <motion.div 
-      className="min-h-screen bg-background text-foreground"
-      initial="initial"
-      animate="in"
-      exit="out"
-      variants={pageVariants}
-      transition={{ duration: 0.5 }}
-    >
+
+    <div className="min-h-screen bg-background text-foreground">
       {/* Navigation */}
-      <motion.nav 
-        className="relative z-50 flex justify-between items-center px-6 py-4"
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
+      <nav className="relative z-50 flex justify-between items-center px-6 py-4">
         <motion.div 
           className="text-3xl font-bold text-foreground"
           whileHover={{ scale: 1.05 }}
@@ -34,35 +18,35 @@ export default function Home() {
         >
           <span className="text-primary">AOT</span> CoDaily
         </motion.div>
-               <div className="flex items-center space-x-6">
-                 <ThemeToggle />
-                 <motion.div
-                   whileHover={{ scale: 1.05 }}
-                   whileTap={{ scale: 0.95 }}
-                 >
-                   <Link
-                     href="/login"
-                     className="text-muted-foreground hover:text-foreground transition-colors duration-300"
-                   >
-                     Sign In
-                   </Link>
-                 </motion.div>
-                 <motion.div
-                   whileHover={{ scale: 1.05 }}
-                   whileTap={{ scale: 0.95 }}
-                 >
-                   <Link
-                     href="/signup"
-                     className="bg-primary text-primary-foreground px-6 py-3 rounded-full font-semibold hover:bg-primary/90 transition-all duration-300 shadow-lg hover:shadow-primary/25"
-                   >
-                     Join Discord
-                   </Link>
-                 </motion.div>
-               </div>
-      </motion.nav>
+        <div className="flex items-center space-x-6">
+          <ThemeToggle />
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <Link
+              href="/login"
+              className="text-muted-foreground hover:text-foreground transition-colors duration-300"
+            >
+              Sign In
+            </Link>
+          </motion.div>
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <Link
+              href="/signup"
+              className="bg-primary text-primary-foreground px-6 py-3 rounded-full font-semibold hover:bg-primary/90 transition-all duration-300 shadow-lg hover:shadow-primary/25"
+            >
+              Get Started
+            </Link>
+          </motion.div>
+        </div>
+      </nav>
 
       {/* Hero Section */}
-      <main className="relative overflow-hidden">
+      <main className="relative">
         {/* Background Elements */}
         <motion.div 
           className="absolute inset-0 bg-gradient-to-r from-primary/20 to-primary/10"
@@ -208,6 +192,7 @@ export default function Home() {
           </div>
         </div>
       </main>
+
 
       {/* Features Section */}
       <motion.section 
@@ -404,7 +389,9 @@ export default function Home() {
             <p>&copy; 2024 AOT CoDaily. All rights reserved.</p>
           </div>
     </div>
+
       </motion.footer>
-    </motion.div>
+    </div>
   );
 }
+

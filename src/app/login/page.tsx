@@ -6,22 +6,10 @@ import { motion } from "framer-motion";
 import { DiscordLoginButton } from "@/components/auth/DiscordLoginButton";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
-const pageVariants = {
-  initial: { opacity: 0, y: 20 },
-  in: { opacity: 1, y: 0 },
-  out: { opacity: 0, y: -20 }
-};
 
 export default function LoginPage() {
   return (
-    <motion.div
-      className="min-h-screen flex items-center justify-center bg-background text-foreground"
-      initial="initial"
-      animate="in"
-      exit="out"
-      variants={pageVariants}
-      transition={{ duration: 0.3 }}
-    >
+    <div className="min-h-screen flex items-center justify-center bg-background text-foreground">
       <div className="max-w-md w-full space-y-8 p-8">
         <div className="absolute top-4 right-4">
           <ThemeToggle />
@@ -80,7 +68,7 @@ export default function LoginPage() {
           transition={{ delay: 0.3 }}
         >
           <h3 className="text-lg font-semibold text-primary mb-3">
-            What you'll get:
+            What you&apos;ll get:
           </h3>
           <ul className="space-y-2 text-sm text-primary/80">
             <li className="flex items-center">
@@ -120,6 +108,6 @@ export default function LoginPage() {
           </p>
         </motion.div>
       </div>
-    </motion.div>
+    </div>
   );
 }
